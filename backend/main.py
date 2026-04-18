@@ -4,7 +4,7 @@ from pydantic import BaseModel
 import requests
 from dotenv import load_dotenv
 
-# Load .env
+
 load_dotenv()
 
 print("GROQ KEY:", os.getenv("GROQ_API_KEY"))
@@ -16,7 +16,7 @@ class ChatRequest(BaseModel):
     message: str
 
 
-# -------- SHARED COMPANY CONTEXT --------
+
 COMPANY_SYSTEM_PROMPT = """
 You are an AI assistant for Cerebrospark Innovations.
 
@@ -74,7 +74,7 @@ Rules:
 """
 
 
-# -------- GROQ FUNCTION --------
+
 def ask_groq(message: str):
     try:
         res = requests.post(
@@ -110,7 +110,7 @@ def ask_groq(message: str):
         return None
 
 
-# -------- GEMINI FUNCTION --------
+
 def ask_gemini(message: str):
     try:
         url = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={os.getenv('GEMINI_API_KEY')}"
@@ -158,21 +158,20 @@ Answer professionally based on the company.
         return None
 
 
-# -------- ROUTE --------
+
 @app.post("/chat")
 async def chat(req: ChatRequest):
     message = req.message.strip()
 
-    # 1) Try Groq
+
     reply = ask_groq(message)
     model = "groq"
 
-    # 2) Fallback to Gemini
     if not reply or len(reply.strip()) == 0:
         reply = ask_gemini(message)
         model = "gemini"
 
-    # 3) Final fallback
+ 
     if not reply:
         reply = "Sorry, I’m unable to respond right now. Please try again shortly."
 
